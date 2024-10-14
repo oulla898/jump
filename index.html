@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Sensor Data</title>
+    <title>Jump Height Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,22 +18,24 @@
         .inactive {
             color: red;
         }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <h1>Live Sensor Data</h1>
+    <h1>Jump Height Calculator</h1>
+    <p>Press "Start" and perform a jump!</p>
+    <button id="start-button">Start</button>
     
     <div class="sensor">
-        <h2>Accelerometer</h2>
+        <h2>Accelerometer Data</h2>
         <p id="accelerometer-status" class="inactive">Status: Not available</p>
         <p id="accelerometer-data">Data: N/A</p>
     </div>
     
-    <div class="sensor">
-        <h2>Gyroscope</h2>
-        <p id="gyroscope-status" class="inactive">Status: Not available</p>
-        <p id="gyroscope-data">Data: N/A</p>
-    </div>
+    <div id="result">Jump Height: N/A</div>
 
     <script src="script.js"></script>
 </body>
