@@ -3,82 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cool Accelerometer Interface</title>
+    <title>Live Sensor Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #1a1a2e;
-            color: #ffffff;
+            margin: 20px;
         }
-        #cube-container {
-            width: 200px;
-            height: 200px;
-            perspective: 400px;
-            margin-bottom: 20px;
+        .sensor {
+            margin-bottom: 15px;
         }
-        #cube {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.1s;
+        .active {
+            color: green;
         }
-        .face {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        #front { transform: translateZ(100px); }
-        #back { transform: rotateY(180deg) translateZ(100px); }
-        #right { transform: rotateY(90deg) translateZ(100px); }
-        #left { transform: rotateY(-90deg) translateZ(100px); }
-        #top { transform: rotateX(-90deg) translateZ(100px); }
-        #bottom { transform: rotateX(90deg) translateZ(100px); }
-        #data-display {
-            text-align: center;
-            font-size: 18px;
-        }
-        #start-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #16213e;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #start-button:hover {
-            background-color: #0f3460;
+        .inactive {
+            color: red;
         }
     </style>
 </head>
 <body>
-    <div id="cube-container">
-        <div id="cube">
-            <div class="face" id="front">Front</div>
-            <div class="face" id="back">Back</div>
-            <div class="face" id="right">Right</div>
-            <div class="face" id="left">Left</div>
-            <div class="face" id="top">Top</div>
-            <div class="face" id="bottom">Bottom</div>
-        </div>
+    <h1>Live Sensor Data</h1>
+    
+    <div class="sensor">
+        <h2>Accelerometer</h2>
+        <p id="accelerometer-status" class="inactive">Status: Not available</p>
+        <p id="accelerometer-data">Data: N/A</p>
     </div>
-    <div id="data-display">Accelerometer Data</div>
-    <button id="start-button">Start Accelerometer</button>
-    <script src="app.js"></script>
+    
+    <div class="sensor">
+        <h2>Gyroscope</h2>
+        <p id="gyroscope-status" class="inactive">Status: Not available</p>
+        <p id="gyroscope-data">Data: N/A</p>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
