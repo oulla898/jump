@@ -1,42 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jump Height Calculator</title>
+    <title>قياس ارتفاع القفزة</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50e3c2;
+            --background-color: #f0f4f8;
+            --text-color: #333;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
         }
-        .sensor {
-            margin-bottom: 15px;
+
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
-        .active {
-            color: green;
+
+        .container.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        .inactive {
-            color: red;
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
         }
-        #result {
-            margin-top: 20px;
+
+        #start-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        #start-button:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .status, .data, .result {
+            margin: 1rem 0;
+            padding: 0.5rem;
+            border-radius: 10px;
+            background-color: rgba(74, 144, 226, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .status.active {
+            background-color: rgba(80, 227, 194, 0.2);
+        }
+
+        .status.inactive {
+            background-color: rgba(227, 80, 80, 0.2);
+        }
+
+        .result {
+            font-size: 1.5rem;
             font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .debug-info {
+            display: none;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            font-size: 0.8rem;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .jump-animation {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .jumper {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            transition: bottom 0.5s ease;
+        }
+
+        .ground {
+            width: 100%;
+            height: 10px;
+            background-color: var(--secondary-color);
+            position: absolute;
+            bottom: 0;
+        }
+
+        @keyframes jump {
+            0%, 100% { bottom: 0; }
+            50% { bottom: 150px; }
+        }
+
+        .jumping .jumper {
+            animation: jump 1s ease-in-out infinite;
+        }
+
+        .data-display {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+
+        .data-item {
+            text-align: center;
+        }
+
+        .data-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .jumping .result {
+            animation: pulse 0.5s infinite;
         }
     </style>
 </head>
 <body>
-    <h1>Jump Height Calculator</h1>
-    <p>Press "Start" and perform a jump!</p>
-    <button id="start-button">Start</button>
-    
-    <div class="sensor">
-        <h2>Accelerometer Data</h2>
-        <p id="accelerometer-status" class="inactive">Status: Not available</p>
-        <p id="accelerometer-data">Data: N/A</p>
-    </div>
-    
-    <div id="result">Jump Height: N/A</div>
+    <div class="container" id="main-container">
+        <h1>قياس ارتفاع القفز</h1>
+        <div class="jump-animation">
+            <div class="ground"></div>
+            <div class="jumper"></div>
+        </div>
+        <button id="start-button">ابدأ</button>
+        <style>
+            @keyframes buttonAnimation {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        
+            #start-button {
+                background-color: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 1rem 2rem;
+                font-size: 1.2rem;
+                border-radius: 50px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, transform 0.3s ease;
+                animation: buttonAnimation 2s infinite; /* Add this animation */
+            }
+        
+            #start-button:hover {
+                background-color: var(--secondary-color);
+                transform: scale(1.1); /* Change hover effect */
+            }
+        
+            #start-button:active {
+                transform: scale(0.95); /* Button click animation */
+            }
+        </style>
+        
+        <div id="accelerometer-status" class="status">الحالة: غير نشط</div>
+        <div class="data-display">
+            <div class="data-item">
+                <div>التسارع الكلي</div>
+                <div id="total-acc" class="data-value">0.00</div>
+            </div>
+            <div class="data-item">
+                <div>التسارع العمودي</div>
+                <div id="vertical-acc" class="data-value">0.00</div>
+            </div>
+        </div>
+        <div id="result" class="result">ارتفاع القفزة: غير متوفر</div>
+        <div id="flight-time-height" class="result">الارتفاع بناءً على وقت الطيران: غير متوفر</div>
+<div id="acceleration-height" class="result">الارتفاع بناءً على التسارع: غير متوفر</div>
 
-    <script src="script.js"></script>
+        <pre id="debug-info" class="debug-info"></pre>
+    </div>
+
+    <script>
+        // Global variables
+        let isJumping = false;
+        let measurementData = [];
+        let debugInfo = [];
+        let jumpDetected = false;
+        let jumpEndTimeout = null;
+
+        const g = 9.81; // Gravity in m/s^2
+
+        function startJumpMeasurement() {
+            if ('DeviceMotionEvent' in window) {
+                if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                    DeviceMotionEvent.requestPermission().then(response => {
+                        if (response === 'granted') {
+                            window.addEventListener('devicemotion', handleMotion);
+                            updateAccelerometerStatus('نشط');
+                        } else {
+                            alert('تم رفض الإذن للوصول إلى حركة الجهاز');
+                        }
+                    });
+                } else {
+                    window.addEventListener('devicemotion', handleMotion);
+                    updateAccelerometerStatus('نشط');
+                }
+            } else {
+                updateAccelerometerStatus('غير مدعوم');
+            }
+        }
+
+        function updateAccelerometerStatus(status) {
+            const statusElement = document.getElementById('accelerometer-status');
+            statusElement.innerText = `الحالة: ${status}`;
+            statusElement.classList.remove('inactive', 'active');
+            statusElement.classList.add(status === 'نشط' ? 'active' : 'inactive');
+        }
+
+        function handleMotion(event) {
+            if (!isJumping) return;
+
+            const acc = event.accelerationIncludingGravity;
+            const timestamp = Date.now();
+            
+            if (acc.x === null || acc.y === null || acc.z === null) {
+                debugInfo.push(`بيانات تسارع غير صالحة في ${timestamp}`);
+                return;
+            }
+
+            const totalAcc = Math.sqrt(acc.x ** 2 + acc.y ** 2 + acc.z ** 2);
+            const verticalAcc = calculateVerticalAcceleration(acc);
+
+            measurementData.push({ x: acc.x, y: acc.y, z: acc.z, timestamp, totalAcc, verticalAcc });
+
+            // Update data display smoothly
+            updateDataDisplay(totalAcc, verticalAcc);
+
+            debugInfo.push(`التسارع في ${timestamp}: X: ${acc.x.toFixed(2)}, Y: ${acc.y.toFixed(2)}, Z: ${acc.z.toFixed(2)}, الإجمالي: ${totalAcc.toFixed(2)}, العمودي: ${verticalAcc.toFixed(2)}`);
+
+            // Detect jump start
+            if (!jumpDetected && totalAcc < g * 0.8) {
+                jumpDetected = true;
+                debugInfo.push(`تم اكتشاف القفزة في ${timestamp}`);
+            }
+
+            // Detect jump end
+            if (jumpDetected && totalAcc > g * 1.2) {
+                clearTimeout(jumpEndTimeout);
+                jumpEndTimeout = setTimeout(() => {
+                    isJumping = false;
+                    calculateAndDisplayJumpHeight();
+                }, 500); // Wait 500ms to ensure the jump has ended
+            }
+        }
+
+        function updateDataDisplay(totalAcc, verticalAcc) {
+            document.getElementById('total-acc').innerText = totalAcc.toFixed(2);
+            document.getElementById('vertical-acc').innerText = verticalAcc.toFixed(2);
+        }
+
+        function calculateAndDisplayJumpHeight() {
+            const jumpHeight = calculateJumpHeight();
+            if (jumpHeight !== null) {
+                document.getElementById('result').innerText = `ارتفاع القفزة: ${jumpHeight.toFixed(2)} متر`;
+            } else {
+                document.getElementById('result').innerText = 'ارتفاع القفزة: غير متوفر';
+            }
+            document.getElementById('start-button').innerText = 'ابدأ';
+            updateAccelerometerStatus('غير نشط');
+            window.removeEventListener('devicemotion', handleMotion);
+            document.getElementById('debug-info').innerText = debugInfo.join('\n');
+            document.getElementById('main-container').classList.remove('jumping');
+        }
+
+        function calculateJumpHeight() {
+            if (measurementData.length < 2) {
+                debugInfo.push('لم يتم جمع بيانات كافية');
+                return null;
+            }
+
+            debugInfo.push(`إجمالي نقاط البيانات المجمعة: ${measurementData.length}`);
+
+            const timeOfFlightHeight = calculateTimeOfFlightHeight();
+            const accelerationBasedHeight = calculateAccelerationBasedHeight();
+
+            debugInfo.push(`ارتفاع وقت الطيران: ${timeOfFlightHeight.toFixed(3)} م`);
+            debugInfo.push(`الارتفاع المعتمد على التسارع: ${accelerationBasedHeight.toFixed(3)} م`);
+
+            // Combine the two methods with weighted average
+            const combinedHeight = (0.6 * timeOfFlightHeight + 0.4 * accelerationBasedHeight);
+
+            return combinedHeight;
+        }
+
+        function calculateTimeOfFlightHeight() {
+            const takeoffIndex = measurementData.findIndex(data => data.totalAcc < g * 0.8);
+            const landingIndex = measurementData.findIndex((data, index) => 
+                index > takeoffIndex && data.totalAcc > g * 1.2);
+
+            if (takeoffIndex === -1 || landingIndex === -1) {
+                debugInfo.push('تعذر اكتشاف الإقلاع أو الهبوط');
+                debugInfo.push(`مؤشر الإقلاع: ${takeoffIndex}, مؤشر الهبوط: ${landingIndex}`);
+                return 0;
+            }
+
+            const flightTime = (measurementData[landingIndex].timestamp - measurementData[takeoffIndex].timestamp) / 1000;
+            debugInfo.push(`وقت الطيران: ${flightTime.toFixed(3)} ثانية`);
+            return (g * flightTime ** 2) / 8;
+        }
+
+        function calculateAccelerationBasedHeight() {
+            let maxUpwardVelocity = 0;
+            let currentVelocity = 0;
+            let prevTimestamp = measurementData[0].timestamp;
+
+            for (let i = 1; i < measurementData.length; i++) {
+                const data = measurementData[i];
+                const dt = (data.timestamp - prevTimestamp) / 1000;
+                prevTimestamp = data.timestamp;
+
+                currentVelocity += data.verticalAcc * dt;
+                if (currentVelocity > maxUpwardVelocity) {
+                    maxUpwardVelocity = currentVelocity;
+                }
+            }
+
+            debugInfo.push(`أقصى سرعة صعود: ${maxUpwardVelocity.toFixed(3)} م/ث`);
+            return maxUpwardVelocity ** 2 / (2 * g);
+        }
+
+        function calculateVerticalAcceleration(acc) {
+            // Calculate the angle of the phone relative to vertical
+            const angleX = Math.atan2(acc.x, Math.sqrt(acc.y ** 2 + acc.z ** 2));
+            const angleY = Math.atan2(acc.y, Math.sqrt(acc.x ** 2 + acc.z ** 2));
+
+            // Calculate the vertical component of acceleration
+            return acc.z * Math.cos(angleX) * Math.cos(angleY) - g;
+        }
+
+        document.getElementById('start-button').addEventListener('click', () => {
+            if (!isJumping) {
+                isJumping = true;
+                jumpDetected = false;
+                measurementData = [];
+                debugInfo = [];
+                document.getElementById('result').innerText = 'ارتفاع القفزة: جاري القياس...';
+                document.getElementById('start-button').innerText = 'إيقاف';
+                document.getElementById('main-container').classList.add('jumping');
+                startJumpMeasurement();
+            } else {
+                isJumping = false;
+                calculateAndDisplayJumpHeight();
+            }
+        });
+
+        // Show the main container after a short delay
+        setTimeout(() => {
+            document.getElementById('main-container').classList.add('visible');
+        }, 500);
+    </script>
+    <script>
+        function calculateAndDisplayJumpHeight() {
+            const jumpHeight = calculateJumpHeight();
+            const timeOfFlightHeight = calculateTimeOfFlightHeight();
+            const accelerationBasedHeight = calculateAccelerationBasedHeight();
+            
+            // Update the jump height display
+            if (jumpHeight !== null) {
+                document.getElementById('result').innerText = `ارتفاع القفزة: ${jumpHeight.toFixed(2)} متر`;
+                document.getElementById('flight-time-height').innerText = `ارتفاع بناءً على وقت الطيران: ${timeOfFlightHeight.toFixed(2)} متر`;
+                document.getElementById('acceleration-height').innerText = `ارتفاع بناءً على التسارع: ${accelerationBasedHeight.toFixed(2)} متر`;
+            } else {
+                document.getElementById('result').innerText = 'ارتفاع القفزة: غير متوفر';
+                document.getElementById('flight-time-height').innerText = 'ارتفاع بناءً على وقت الطيران: غير متوفر';
+                document.getElementById('acceleration-height').innerText = 'ارتفاع بناءً على التسارع: غير متوفر';
+            }
+            
+            document.getElementById('start-button').innerText = 'ابدأ';
+            updateAccelerometerStatus('غير نشط');
+            window.removeEventListener('devicemotion', handleMotion);
+            document.getElementById('debug-info').innerText = debugInfo.join('\n');
+            document.getElementById('main-container').classList.remove('jumping');
+        }
+        
+        // Define other necessary functions like calculateJumpHeight, calculateTimeOfFlightHeight, etc.
+    </script>
 </body>
 </html>
